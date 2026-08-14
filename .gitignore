@@ -1,0 +1,9 @@
+# Machine-specific diagnostics and scan results
+logs/
+reports/
+
+# Generated application resources. Recreate with scripts/build-app.sh.
+Antigravity-ZH.app/Contents/Resources/
+
+# Finder metadata
+.DS_Store
