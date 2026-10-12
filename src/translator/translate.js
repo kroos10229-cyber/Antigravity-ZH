@@ -2,10 +2,19 @@
   'use strict';
 
   const translations = __ANTIGRAVITY_TRANSLATIONS__;
-  if (window.__ANTIGRAVITY_ZH__?.setTranslations) {
+  if (window.__ANTIGRAVITY_ZH__?.version === '0.3.0' && window.__ANTIGRAVITY_ZH__?.setTranslations) {
     window.__ANTIGRAVITY_ZH__.setTranslations(translations);
     window.__ANTIGRAVITY_ZH__.translate();
     return ({ installed: true, translated: window.__ANTIGRAVITY_ZH__.translatedCount });
+  }
+  if (window.__ANTIGRAVITY_ZH__) {
+    if (!window.__ANTIGRAVITY_ZH__.dispose) {
+      window.__ANTIGRAVITY_ZH__.setTranslations(translations);
+      window.__ANTIGRAVITY_ZH__.translate();
+      return ({ installed: true, restartRequired: true });
+    }
+    window.__ANTIGRAVITY_ZH__.dispose();
+    delete window.__ANTIGRAVITY_ZH__;
   }
   let dictionary = translations;
   let phrases = Object.entries(dictionary)
@@ -21,7 +30,13 @@
   const attributes = ['aria-label', 'title', 'placeholder'];
   const dynamicReplacements = [
     [/^Worked for\s+(.+)$/, '已工作 $1'],
-    [/^Error ID:\s*(.+)$/, '错误 ID：$1']
+    [/^Error ID:\s*(.+)$/, '错误 ID：$1'],
+    [/^Select model, current:\s*(.+)$/, '选择模型，当前：$1'],
+    [/^(\d+)mo$/, '$1个月'],
+    [/^No more older messages, showing (\d+) of (\d+)$/, '没有更早的消息了，已显示 $1/$2 条'],
+    [/^(\d+)m ago$/, '$1分钟前'],
+    [/^(\d+)h ago$/, '$1小时前'],
+    [/^(\d+)d ago$/, '$1天前']
   ];
   let translated = 0;
 
@@ -90,7 +105,8 @@
       }
     });
     window.__ANTIGRAVITY_ZH__ = {
-      version: '0.1.0',
+      version: '0.3.0',
+      dispose() { observer.disconnect(); },
       translate,
       setTranslations(next) {
         dictionary = next;

@@ -37,6 +37,12 @@ function isTranslatableUiCandidate(value) {
   return true;
 }
 
+function hasTranslation(value, translations) {
+  return Object.hasOwn(translations, value)
+    || /^Select model, current:\s*(.+)$/.test(value)
+    || /^(\d+)mo$/.test(value);
+}
+
 async function main() {
   const port = await discoverDevToolsPort();
   const [translations, targets] = await Promise.all([
@@ -45,7 +51,7 @@ async function main() {
   ]);
   const scanned = await Promise.all(targets.map((target) => evaluate(target, expression)));
   const strings = [...new Set(scanned.flat())].filter(isTranslatableUiCandidate).sort((a, b) => a.localeCompare(b));
-  const untranslated = strings.filter((value) => !Object.hasOwn(translations, value));
+  const untranslated = strings.filter((value) => !hasTranslation(value, translations));
   const covered = strings.length - untranslated.length;
   const rate = strings.length ? ((covered / strings.length) * 100).toFixed(1) : '0.0';
   const markdown = [
