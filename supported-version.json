@@ -2,10 +2,11 @@
   "tested": [
     "2.8.0",
     "2.21.1",
-    "2.22.0"
+    "2.22.0",
+    "2.23.0"
   ],
-  "current": "2.22.0",
+  "current": "2.23.0",
   "appPath": "/Applications/Antigravity.app",
-  "appAsarSha256": "259c83ffa266088dda6ede520a601bbf06cc5c34985cdf56c5d68549c98dbb0e",
-  "checkedAt": "2026-10-12T10:38:27.265Z"
+  "appAsarSha256": "4e99093662d797ecba823e92823d352413e3bf2ca721257df4a255c045df1598",
+  "checkedAt": "2026-10-13T14:03:00.470Z"
 }

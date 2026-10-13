@@ -1,6 +1,6 @@
 # Antigravity-ZH
 
-面向 macOS 上 Google Antigravity 2.22.0 的非官方简体中文 UI 增强工具。它不修改 `/Applications/Antigravity.app`，不读取账户凭证、不拦截网络请求，也不改变模型响应或权限机制。
+面向 macOS 上 Google Antigravity 2.23.0 的非官方简体中文 UI 增强工具。它不修改 `/Applications/Antigravity.app`，不读取账户凭证、不拦截网络请求，也不改变模型响应或权限机制。
 
 > 本项目与 Google 或 Antigravity 没有隶属、赞助或认可关系。仓库不包含官方 Antigravity 的程序、图标或其他品牌资源；构建脚本只会从使用者已安装的官方应用中读取图标。
 
@@ -23,7 +23,7 @@ scripts/build-app.sh
 
 ## 限制与安全边界
 
-- 依赖官方 2.22.0 已验证的本地 DevTools 接口；升级后先运行 `scripts/update.sh`。扫描仅覆盖当前打开界面，不代表全应用覆盖率。
+- 依赖官方 2.23.0 已验证的本地 DevTools 接口；升级后先运行 `scripts/update.sh`。扫描仅覆盖当前打开界面，不代表全应用覆盖率。
 - 只翻译精确匹配的 UI 字符串，代码、命令、终端输出、路径、URL、模型名及可编辑聊天内容保持原样。
 - 不使用 app.asar 补丁；`restore.sh` 不需要恢复官方应用。
 - 若自动发现失败，可设置环境变量 `ANTIGRAVITY_ZH_DEBUG_PORT` 为当前 Antigravity 的本机 DevTools 端口后从终端启动 launcher。

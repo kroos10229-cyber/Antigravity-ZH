@@ -2,7 +2,7 @@
   'use strict';
 
   const translations = __ANTIGRAVITY_TRANSLATIONS__;
-  if (window.__ANTIGRAVITY_ZH__?.version === '0.3.0' && window.__ANTIGRAVITY_ZH__?.setTranslations) {
+  if (window.__ANTIGRAVITY_ZH__?.version === '0.3.1' && window.__ANTIGRAVITY_ZH__?.setTranslations) {
     window.__ANTIGRAVITY_ZH__.setTranslations(translations);
     window.__ANTIGRAVITY_ZH__.translate();
     return ({ installed: true, translated: window.__ANTIGRAVITY_ZH__.translatedCount });
@@ -29,6 +29,8 @@
   ].join(',');
   const attributes = ['aria-label', 'title', 'placeholder'];
   const dynamicReplacements = [
+    [/^Agent permissions preset selector, current:\s*(.+)$/, '智能体权限预设，当前：$1'],
+    [/^Select project, current:\s*(.+)$/, '选择项目，当前：$1'],
     [/^Worked for\s+(.+)$/, '已工作 $1'],
     [/^Error ID:\s*(.+)$/, '错误 ID：$1'],
     [/^Select model, current:\s*(.+)$/, '选择模型，当前：$1'],
@@ -81,6 +83,21 @@
     while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const node of nodes) {
       if (isProtected(node)) continue;
+      const text = (node.nodeValue || '').trim();
+      const context = node.parentElement?.textContent || '';
+      const planHint = node.parentElement?.closest('[data-testid="plan-command-fyi-alert"]');
+      const fragments = planHint ? {
+        'Type': '输入', 'and select': '并选择',
+        'to have the agent generate a plan.': '即可让智能体生成计划。'
+      } : /Google Chrome/.test(context) ? {
+        'Configure the browser subagent. It requires': '配置浏览器子智能体。需要安装',
+        'to be installed.': '。'
+      } : {};
+      if (fragments[text]) {
+        node.nodeValue = node.nodeValue.replace(text, fragments[text]);
+        translated++;
+        continue;
+      }
       const replacement = replace(node.nodeValue || '');
       if (replacement) {
         node.nodeValue = replacement;
@@ -105,7 +122,7 @@
       }
     });
     window.__ANTIGRAVITY_ZH__ = {
-      version: '0.3.0',
+      version: '0.3.1',
       dispose() { observer.disconnect(); },
       translate,
       setTranslations(next) {

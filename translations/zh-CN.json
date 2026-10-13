@@ -307,5 +307,20 @@
   "Undo to this point": "撤销到此处",
   "Marketplace": "扩展市场",
   "Installed": "已安装",
-  "Search customizations...": "搜索自定义项…"
+  "Search customizations...": "搜索自定义项…",
+  "Application": "应用",
+  "Learn more": "了解更多",
+  "Plan Review Policy": "计划审查策略",
+  "Auto (Preview)": "自动（预览）",
+  "Permission Preset": "权限预设",
+  "Tool Permissions": "工具权限",
+  "Pinned Actions": "已固定的操作",
+  "Show All": "显示全部",
+  "Configure global allowed and denied resource permissions.": "配置全局允许和禁止访问的资源权限。",
+  "Controls the actions the agent can take.": "控制智能体可以执行的操作。",
+  "Modify permissions for file, terminal, and MCP tools.": "修改文件、终端和 MCP 工具的权限。",
+  "Queue until after the current turn.": "排队，等待当前轮次结束后发送。",
+  "Interrupt the agent and send immediately.": "中断智能体并立即发送。",
+  "Whether the agent asks you to review its documents.": "是否要求你审阅智能体生成的文档。",
+  "The browser subagent can be invoked by typing /browser in the conversation input box.": "在对话输入框中输入 /browser 即可调用浏览器子智能体。"
 }
