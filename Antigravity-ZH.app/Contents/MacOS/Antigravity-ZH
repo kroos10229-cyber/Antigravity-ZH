@@ -8,7 +8,7 @@ exec >> "$LOG_FILE" 2>&1
 print -r -- "[$(date '+%Y-%m-%d %H:%M:%S')] Antigravity-ZH launcher invoked"
 
 for NODE_BIN in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node; do
-  if [[ -x "$NODE_BIN" ]]; then
+  if [[ -x "$NODE_BIN" ]] && "$NODE_BIN" -e 'process.exit(Number(process.versions.node.split(".")[0]) >= 22 ? 0 : 1)'; then
     print -r -- "Using Node.js: $NODE_BIN"
     # The background monitor owns renderer injection.  Let this app exit at
     # once so macOS does not keep its Dock icon bouncing without a window.
@@ -21,5 +21,5 @@ for NODE_BIN in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node; do
 done
 
 print -r -- "Node.js was not found"
-/usr/bin/osascript -e 'display alert "无法启动 Antigravity-ZH" message "未找到 Node.js。请安装 Node.js 18 或更高版本后重试。" as critical'
+/usr/bin/osascript -e 'display alert "无法启动 Antigravity-ZH" message "未找到兼容的 Node.js。请安装 Node.js 22 或更高版本后重试。" as critical'
 exit 1

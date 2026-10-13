@@ -3,6 +3,9 @@ import { readFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 const defaultPort = 9222;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,7 +36,10 @@ export async function getTargets(port = defaultPort) {
   const response = await fetch(`http://127.0.0.1:${port}/json/list`);
   if (!response.ok) throw new Error(`DevTools endpoint returned ${response.status}`);
   const targets = await response.json();
-  return targets.filter((target) => target.type === 'page' && target.webSocketDebuggerUrl);
+  // Never inject the user's private cache into an OAuth page or web preview.
+  return targets.filter((target) => target.type === 'page' && target.webSocketDebuggerUrl
+    && target.title === 'Antigravity'
+    && /^https?:\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?(?:\/|$)/i.test(target.url));
 }
 
 export async function evaluate(target, expression) {
@@ -69,21 +75,35 @@ export async function evaluate(target, expression) {
 }
 
 export async function buildTranslatorExpression(root) {
-  const [source, translations] = await Promise.all([
+  const localPath = process.env.ANTIGRAVITY_ZH_LOCAL_TRANSLATIONS || join(homedir(), 'Library', 'Application Support', 'Antigravity-ZH', 'local.zh-CN.json');
+  const localPromise = readFile(localPath, 'utf8').then(JSON.parse).then((values) => Object.fromEntries(Object.entries(values).filter(([, value]) => typeof value === 'string'))).catch((error) => {
+    if (error.code !== 'ENOENT') console.warn('Invalid local translation cache ignored');
+    return {};
+  });
+  const [source, translations, details, reviewed, templates, local] = await Promise.all([
     readFile(new URL('../translator/translate.js', import.meta.url), 'utf8'),
-    readFile(new URL('../../translations/zh-CN.json', import.meta.url), 'utf8')
+    readFile(new URL('../../translations/zh-CN.json', import.meta.url), 'utf8'),
+    readFile(new URL('../../translations/details.zh-CN.json', import.meta.url), 'utf8'),
+    readFile(new URL('../../translations/ui-reviewed.zh-CN.json', import.meta.url), 'utf8'),
+    readFile(new URL('../../translations/templates.zh-CN.json', import.meta.url), 'utf8'),
+    localPromise
   ]);
-  return source.replace('__ANTIGRAVITY_TRANSLATIONS__', translations.trim());
+  const ui = JSON.stringify({...JSON.parse(translations), ...JSON.parse(reviewed)});
+  const descriptions = JSON.stringify({...JSON.parse(details), ...local});
+  return source.replace(/__ANTIGRAVITY_TRANSLATIONS__|__ANTIGRAVITY_DETAIL_TRANSLATIONS__|__ANTIGRAVITY_TEMPLATES__/g, (marker) => ({__ANTIGRAVITY_TRANSLATIONS__:ui, __ANTIGRAVITY_DETAIL_TRANSLATIONS__:descriptions, __ANTIGRAVITY_TEMPLATES__:templates})[marker]);
 }
 
 export async function injectOnce({ port = defaultPort, root = process.cwd() } = {}) {
   const expression = await buildTranslatorExpression(root);
+  const fingerprint = createHash('sha256').update(expression).digest('hex');
   const targets = await getTargets(port);
   if (!targets.length) throw new Error('No Electron renderer page is available');
-  const results = await Promise.all(targets.map(async (target) => ({
-    url: target.url,
-    result: await evaluate(target, expression)
-  })));
+  const results = await Promise.all(targets.map(async (target) => {
+    const current = await evaluate(target, 'window.__ANTIGRAVITY_ZH__?.injectionFingerprint');
+    if (current === fingerprint) return {url: target.url, result: {installed: true, unchanged: true}};
+    const result = await evaluate(target, expression + `\n;window.__ANTIGRAVITY_ZH__.injectionFingerprint=${JSON.stringify(fingerprint)};({installed:true, translated:window.__ANTIGRAVITY_ZH__.translatedCount});`);
+    return {url: target.url, result};
+  }));
   return results;
 }
 
