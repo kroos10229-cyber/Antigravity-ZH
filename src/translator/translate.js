@@ -13,7 +13,7 @@
     }).join('');
     return {pattern: new RegExp('^' + pattern + '$'), target, ids};
   });
-  if (window.__ANTIGRAVITY_ZH__?.version === '0.4.12' && window.__ANTIGRAVITY_ZH__?.setTranslations) {
+  if (window.__ANTIGRAVITY_ZH__?.version === '0.5.0-r1' && window.__ANTIGRAVITY_ZH__?.setTranslations) {
     window.__ANTIGRAVITY_ZH__.setTranslations(translations, detailTranslations);
     window.__ANTIGRAVITY_ZH__.translate();
     return ({ installed: true, translated: window.__ANTIGRAVITY_ZH__.translatedCount });
@@ -64,6 +64,8 @@
   const protectedAttributeSelector = protectedSelector.replace('textarea,', '').replace('[contenteditable="true"],', '').replace(',[data-quotable="true"]', '');
   const attributes = ['aria-label', 'title', 'placeholder'];
   const dynamicReplacements = [
+    [/^Hello, (.+)\.$/, '你好，$1。'],
+    [/^Branch, current: (.+)$/, '分支，当前：$1'],
     [/^Opens external link:\s*(.+)$/, '打开外部链接：$1'],
     [/^(?:More actions|更多操作) for (.+)$/, '$1 的更多操作'],
     [/^Global: Installed in (.+)$/, '全局：安装于 $1'],
@@ -165,6 +167,10 @@
       if (isProtected(node)) continue;
       const text = (node.nodeValue || '').trim();
       const context = node.parentElement?.textContent || '';
+      if (/^(?:No|暂无)\s+(?:automations|自动化任务)\s+(?:yet|尚未)/.test(context.trim())) {
+        if (text === 'No') { node.nodeValue = node.nodeValue.replace('No', '暂无'); continue; }
+        if (text === 'yet' || text === '尚未') { node.nodeValue = ''; continue; }
+      }
       const planHint = node.parentElement?.closest('[data-testid="plan-command-fyi-alert"]');
       const fragments = planHint ? {
         'Type': '输入', 'and select': '并选择',
@@ -203,7 +209,7 @@
       }
     });
     window.__ANTIGRAVITY_ZH__ = {
-      version: '0.4.12',
+      version: '0.5.0-r1',
       dispose() { observer.disconnect(); },
       translate,
       setTranslations(next, details = {}) {
