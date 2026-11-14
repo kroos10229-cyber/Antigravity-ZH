@@ -1,12 +1,12 @@
 # Antigravity-ZH
 
-面向 macOS 上 Google Antigravity 2.30.0 的非官方简体中文 UI 增强工具。它不修改 `/Applications/Antigravity.app`，不读取账户凭证、不拦截网络请求，也不改变模型响应或权限机制。
+面向 macOS 上 Google Antigravity 2.31.2 的非官方简体中文 UI 增强工具。它不修改 `/Applications/Antigravity.app`，不读取账户凭证、不拦截网络请求，也不改变模型响应或权限机制。
 
 > 本项目与 Google 或 Antigravity 没有隶属、赞助或认可关系。仓库不包含官方 Antigravity 的程序、图标或其他品牌资源；构建脚本只会从使用者已安装的官方应用中读取图标。
 
 ## 使用
 
-前提：已安装官方 Antigravity 2.30.0 和 Node.js 22 或更高版本。发布包内置译文，使用者不需要安装离线翻译模型。
+前提：已安装官方 Antigravity 2.31.2 和 Node.js 22 或更高版本。发布包内置译文，使用者不需要安装离线翻译模型。
 
 1. 双击 `Antigravity-ZH.app`。启动器的运行文件已内置在 app 中，因此可单独移动该 app。
 2. 启动器会打开官方 Antigravity，发现其仅限本机的随机 DevTools 端口，并把翻译层附着到 renderer。
@@ -31,7 +31,7 @@ scripts/build-app.sh
 
 ## 限制与安全边界
 
-- 依赖官方 2.30.0 已验证的本地 DevTools 接口；升级后先运行 `scripts/update.sh`。扫描仅覆盖当前打开界面，不代表全应用覆盖率。
+- 依赖官方 2.31.2 已验证的本地 DevTools 接口；升级后先运行 `scripts/update.sh`。扫描仅覆盖当前打开界面，不代表全应用覆盖率。
 - 翻译界面及技能说明；代码块、命令、终端、文件名、URL、可编辑内容和用户/模型对话正文保持原样。部分长句采用受限片段匹配。
 - 外部汉化只作用于 Electron 网页界面；macOS 原生菜单、原生崩溃窗口及新版本新增的未知文案不在已验证范围内。
 - 不使用 app.asar 补丁；`restore.sh` 不需要恢复官方应用。

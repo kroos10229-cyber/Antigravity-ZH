@@ -38,7 +38,7 @@ export async function getTargets(port = defaultPort) {
   const targets = await response.json();
   // Never inject the user's private cache into an OAuth page or web preview.
   return targets.filter((target) => target.type === 'page' && target.webSocketDebuggerUrl
-    && target.title === 'Antigravity'
+    && (target.title === 'Antigravity' || / - Antigravity$/.test(target.title))
     && /^https?:\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?(?:\/|$)/i.test(target.url));
 }
 

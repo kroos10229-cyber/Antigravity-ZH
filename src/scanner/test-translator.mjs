@@ -30,4 +30,13 @@ assert.equal(result.control,'复制代码');
 assert.equal(result.filename,'google-cloud-discovery.md');
 const popup=await evaluate(target,`(() => {const p=document.createElement('p');p.textContent='Failed to save project settings: Demo$1';window.__ANTIGRAVITY_ZH__.translate(p);return p.textContent;})()`);
 assert.equal(popup,'保存项目设置失败：Demo$1');
-console.log(JSON.stringify({passed:14,popup,...result},null,2));
+const permission=await evaluate(target,`(() => {
+ const d=document.createElement('div');
+ const labels=['Allow read access to this path?','Yes, allow this time','Yes, and always allow in this conversation','Yes, and always allow','(tell the agent what to do instead)','Skip','Submit'];
+ for(const label of labels){const p=document.createElement('p');p.textContent=label;d.append(p);}
+ const path=document.createElement('code');path.textContent='/Users/demo/SKILL.md';d.append(path);
+ window.__ANTIGRAVITY_ZH__.translate(d);
+ return [...d.children].map(x=>x.textContent);
+})()`);
+assert.deepEqual(permission,['允许读取此路径吗？','是，仅本次允许','是，在当前对话中始终允许','是，始终允许','（告诉智能体应改为执行什么）','跳过','提交','/Users/demo/SKILL.md']);
+console.log(JSON.stringify({passed:22,permission,popup,...result},null,2));
