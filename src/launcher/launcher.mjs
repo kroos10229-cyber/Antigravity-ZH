@@ -9,7 +9,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function launchOfficialApp() {
   // Without -n, macOS foregrounds a running Antigravity instance instead of
   // creating a second, hidden-looking copy. If it is not running, it launches it.
-  const child = spawn('open', [appPath], {
+  const child = spawn('open', [appPath, '--args', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0'], {
     detached: true,
     stdio: 'ignore'
   });
@@ -19,33 +19,25 @@ function launchOfficialApp() {
 async function main() {
   console.log('Launching official Antigravity…');
   launchOfficialApp();
-  let announced = false;
-  let failedChecksAfterAttach = 0;
-  const deadline = Date.now() + 30_000;
+  let attachedPort;
+  let retryDelay = 2_500;
   for (;;) {
     try {
       const port = await discoverDevToolsPort();
       const targets = await injectOnce({ port });
-      if (!announced) {
+      if (attachedPort !== port) {
         console.log(`Chinese translation layer attached to ${targets.length} renderer(s) through local port ${port}.`);
-        announced = true;
+        attachedPort = port;
       }
-      failedChecksAfterAttach = 0;
-    } catch (error) {
-      if (announced) {
-        failedChecksAfterAttach++;
-        // Once the official renderer has disappeared for several checks, exit.
-        // This lets macOS run this launcher again on the next double-click.
-        if (failedChecksAfterAttach >= 4) {
-          console.log('Antigravity closed; Antigravity-ZH launcher is exiting.');
-          return;
-        }
-      } else if (Date.now() > deadline) {
-        console.error(`Could not attach to Antigravity: ${error.message}`);
-        return;
+      retryDelay = 2_500;
+    } catch {
+      if (attachedPort !== undefined) {
+        console.log('Antigravity renderer disconnected; waiting to reconnect.');
       }
+      attachedPort = undefined;
+      retryDelay = Math.min(retryDelay * 2, 10_000);
     }
-    await wait(2_500);
+    await wait(retryDelay);
   }
 }
 

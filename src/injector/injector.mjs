@@ -13,7 +13,7 @@ const execFileAsync = promisify(execFile);
 
 async function isAntigravityDevTools(port) {
   try {
-    const response = await fetch(`http://127.0.0.1:${port}/json/version`);
+    const response = await fetch(`http://127.0.0.1:${port}/json/version`, { signal: AbortSignal.timeout(1500) });
     if (!response.ok) return false;
     const version = await response.json();
     return /Antigravity/i.test(version['User-Agent'] || '') || /Antigravity/i.test(version.Browser || '');
@@ -33,7 +33,7 @@ export async function discoverDevToolsPort() {
 }
 
 export async function getTargets(port = defaultPort) {
-  const response = await fetch(`http://127.0.0.1:${port}/json/list`);
+  const response = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(2500) });
   if (!response.ok) throw new Error(`DevTools endpoint returned ${response.status}`);
   const targets = await response.json();
   // Never inject the user's private cache into an OAuth page or web preview.

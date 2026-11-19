@@ -64,6 +64,7 @@
   const protectedAttributeSelector = protectedSelector.replace('textarea,', '').replace('[contenteditable="true"],', '').replace(',[data-quotable="true"]', '');
   const attributes = ['aria-label', 'title', 'placeholder'];
   const dynamicReplacements = [
+    [/^Good to see you, (.+?)\. What's next\?$/, '很高兴见到你，$1。接下来想做什么？'],
     [/^Hello, (.+)\.$/, '你好，$1。'],
     [/^Branch, current: (.+)$/, '分支，当前：$1'],
     [/^Opens external link:\s*(.+)$/, '打开外部链接：$1'],
